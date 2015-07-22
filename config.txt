@@ -1,0 +1,1 @@
+{"HIP_CHAT_AUTH_TOKEN": "myAuthToken", "HIP_CHAT_ROOM": "roomName"}
