@@ -8,7 +8,7 @@ Both can be installed via pip (which itself can be downloaded here: https://pypi
 pip install hypchat<br>
 pip install soco<br>
 
-To use this with your Sonos system and hipchat you will need:
+To use this with your Sonos system and hipchat you will need:<br>
 -The IP Address of your Sonos Player<br>
 -Your hipchat auth token<br>
 -The name of a hipchat room for your bot to live in<br>
