@@ -44,17 +44,17 @@ while not needToQuit:
             noteStr = '<a href="http://www.google.com/search?q='+searchStr + '">'
             if(currentTrackInfo == None or newTrackInfo['album'] != currentTrackInfo['album']):
                 noteStr += '<img style="float:left; width:50px;height:50px;" src="' + unicode(newTrackInfo['album_art'])+ '">'
-            noteStr += '<p style="float:right">'
-            noteStr += 'Title: <b>' + unicode(newTrackInfo['title']) + '</b><br>'
-            noteStr += ' Artist: <b>' + unicode(newTrackInfo['artist'])+ '</b><br>'
-            noteStr +=' Album: <b>' + unicode(newTrackInfo['album'])+ '</b>'
+            noteStr += '<p >'
+            noteStr += '<b>' + unicode(newTrackInfo['title']) + '</b>'
+            noteStr += ' - <b>' + unicode(newTrackInfo['artist'])+ '</b>'
+            noteStr +=' - <b>' + unicode(newTrackInfo['album'])+ '</b>'
             noteStr += '</p></a>'
     ##        hipChatRoom.topic( 'Title: ' + unicode(newTrackInfo['title']) + ' Artist: ' + unicode(newTrackInfo['artist']) + ' Album: ' + unicode(newTrackInfo['album']))
             hipChatRoom.message( noteStr)
             print unicode(newTrackInfo)
             currentTrackInfo = newTrackInfo
     except Exception as e:
-        # keep the bot alive even if there is a problem
+##        keep the bot alive even if there is a problem
         hipChatRoom.message( 'A problem occurred while trying to get the track info!' )
         print 'An exception occurred!!!'
         print type(e)
