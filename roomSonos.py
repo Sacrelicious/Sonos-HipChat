@@ -6,6 +6,14 @@ import sys
 from hypchat import *
 import time
 import json
+import logging
+
+logging.basicConfig(filename='output.log',level=logging.DEBUG)
+
+#print to output and to the log file
+def printlog(a):
+    logging.debug(a)
+    print a
 
 #load settings
 f = open('config.txt','r')
@@ -22,12 +30,12 @@ currentTrackInfo = None
 needToQuit = False
 
 ##list all available hipchat rooms
+##and connect to the one specified in config.txt
 for room in hipchat.rooms()['items']:
-    print room['name']
+    printlog(room['name'])
     if(room['name'] == hipChatRoomName):
         hipChatRoom = room
-print 'joined room: ' + hipChatRoom['name']
-
+printlog('joined room: ' + hipChatRoom['name'])
 
 while not needToQuit:
     try:
@@ -36,10 +44,14 @@ while not needToQuit:
         if zone.get_current_transport_info()['current_transport_state'] == 'PLAYING':
 ##              if the current track exists and is different from the last we found procede
             if(currentTrackInfo == None or newTrackInfo['title'] != currentTrackInfo['title']):
+                #format a cool hipchat message containing a search link an album image and the track info
+                #put together a google search url
                 searchStr = unicode(newTrackInfo['title']) +' ' + unicode(newTrackInfo['artist']) + ' ' +unicode(newTrackInfo['album'])
                 searchStr = searchStr.replace(' ','+')
-                print searchStr
+                printlog(searchStr)
+                
                 noteStr = '<a href="http://www.google.com/search?q='+searchStr + '">'
+                #only include the album image if this track has a different album from the last one
                 if(currentTrackInfo == None or newTrackInfo['album'] != currentTrackInfo['album']):
                     noteStr += '<img style="float:left; width:50px;height:50px;" src="' + unicode(newTrackInfo['album_art'])+ '">'
                 noteStr += '<p >'
@@ -48,17 +60,20 @@ while not needToQuit:
                 noteStr +=' - <b>' + unicode(newTrackInfo['album'])+ '</b>'
                 noteStr += '</p></a>'
         ##        hipChatRoom.topic( 'Title: ' + unicode(newTrackInfo['title']) + ' Artist: ' + unicode(newTrackInfo['artist']) + ' Album: ' + unicode(newTrackInfo['album']))
+                #send the message to hipchat
                 hipChatRoom.message( noteStr)
-                print unicode(newTrackInfo)
+                printlog(unicode(newTrackInfo))
                 
                 currentTrackInfo = newTrackInfo
     except Exception as e:
 ##        keep the bot alive even if there is a problem
         hipChatRoom.message( 'A problem occurred while trying to get the track info!' )
-        print 'An exception occurred!!!'
-        print type(e)
-        print e.args
-        print e
+        printlog('An exception occurred!!!')
+        printlog(type(e))
+        printlog(e.args)
+        printlog(e)
+        
+    #don't scan again for another 5 seconds
     time.sleep(5)
 
 
