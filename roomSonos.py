@@ -3,6 +3,7 @@
 from soco import SoCo
 import soco
 import sys
+import cgi
 from hypchat import *
 import time
 import json
@@ -23,6 +24,7 @@ f.close()
 zone = SoCo(settings['SONOS_IP_ADDRESS'])
 hipchat = HypChat(settings['HIP_CHAT_AUTH_TOKEN'])
 hipChatRoomName = settings['HIP_CHAT_ROOM']
+hipChatRoomId = settings['HIP_CHAT_ROOM_ID']
 
 hipChatRoom = None
 currentTrackInfo = None
@@ -31,10 +33,14 @@ needToQuit = False
 
 ##list all available hipchat rooms
 ##and connect to the one specified in config.txt
-for room in hipchat.rooms()['items']:
-    printlog(room['name'])
-    if(room['name'] == hipChatRoomName):
-        hipChatRoom = room
+if hipChatRoomName:
+    for room in hipchat.rooms()['items']:
+        printlog(room['name'])
+        if(room['name'] == hipChatRoomName):
+            hipChatRoom = room
+else:
+    hipChatRoom = hipchat.get_room(hipChatRoomId)
+
 printlog('joined room: ' + hipChatRoom['name'])
 
 while not needToQuit:
@@ -49,21 +55,22 @@ while not needToQuit:
                 searchStr = unicode(newTrackInfo['title']) +' ' + unicode(newTrackInfo['artist']) + ' ' +unicode(newTrackInfo['album'])
                 searchStr = searchStr.replace(' ','+')
                 printlog(searchStr)
-                
+
                 noteStr = '<a href="http://www.google.com/search?q='+searchStr + '">'
                 #only include the album image if this track has a different album from the last one
                 if(currentTrackInfo == None or newTrackInfo['album'] != currentTrackInfo['album']):
                     noteStr += '<img style="float:left; width:50px;height:50px;" src="' + unicode(newTrackInfo['album_art'])+ '">'
                 noteStr += '<p >'
+                noteStr += 'Now playing at ' + unicode(zone.player_name) + ': '
                 noteStr += '<b>' + unicode(newTrackInfo['title']) + '</b>'
                 noteStr += ' - <b>' + unicode(newTrackInfo['artist'])+ '</b>'
                 noteStr +=' - <b>' + unicode(newTrackInfo['album'])+ '</b>'
                 noteStr += '</p></a>'
         ##        hipChatRoom.topic( 'Title: ' + unicode(newTrackInfo['title']) + ' Artist: ' + unicode(newTrackInfo['artist']) + ' Album: ' + unicode(newTrackInfo['album']))
                 #send the message to hipchat
-                hipChatRoom.message( noteStr)
+                hipChatRoom.notification(noteStr)
                 printlog(unicode(newTrackInfo))
-                
+
                 currentTrackInfo = newTrackInfo
     except Exception as e:
 ##        keep the bot alive even if there is a problem
@@ -72,8 +79,6 @@ while not needToQuit:
         printlog(type(e))
         printlog(e.args)
         printlog(e)
-        
+
     #don't scan again for another 5 seconds
     time.sleep(5)
-
-
